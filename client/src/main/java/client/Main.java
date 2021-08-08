@@ -9,10 +9,10 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/sample.fxml"));
-        primaryStage.setTitle("myChat");
-        primaryStage.setScene(new Scene(root, 600, 500));
+        primaryStage.setTitle("Speaker");
+        primaryStage.setScene(new Scene(root, 640, 480));
         primaryStage.show();
     }
 
