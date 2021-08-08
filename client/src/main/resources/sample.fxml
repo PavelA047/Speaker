@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import java.net.URL?>
+<?import javafx.scene.control.PasswordField?>
 <VBox fx:controller="client.Controller"
       xmlns:fx="http://javafx.com/fxml" alignment="center">
 
@@ -11,9 +12,16 @@
         <URL value="@/css/style.css"/>
     </stylesheets>
 
+    <HBox fx:id="authPanel">
+        <TextField fx:id="loginField" promptText="login" HBox.hgrow="ALWAYS"/>
+        <PasswordField fx:id="passwordField" promptText="password" HBox.hgrow="ALWAYS"
+                       onAction="#tryToAuth"/>
+        <Button text="auth" minHeight="50" onAction="#tryToAuth"/>
+    </HBox>
+
     <TextArea fx:id="textArea" VBox.vgrow="ALWAYS" editable="false"/>
 
-    <HBox>
+    <HBox fx:id="msgPanel" visible="false" managed="false">
         <TextField fx:id="textField" HBox.hgrow="ALWAYS" promptText="input"
                    onAction="#sendMsg"/>
         <Button text="Send" onAction="#sendMsg"/>
