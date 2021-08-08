@@ -54,14 +54,7 @@ public class ClientHandler {
                             System.out.println("Client disconnected");
                             break;
                         }
-
-                        if (string.startsWith("/w")) {
-                            String specificMsg = string.split("\\s", 3)[2];
-                            String specificNick = string.split("\\s", 3)[1];
-                            server.sendSpecificMsg(specificNick, specificMsg, this);
-                        } else {
-                            server.broadcastMassage(this, string);
-                        }
+                        server.broadcastMassage(this, string);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
