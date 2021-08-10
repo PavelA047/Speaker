@@ -43,6 +43,16 @@ public class Server {
         }
     }
 
+    public void sendSpecificMsg(String sNick, String sMsg, ClientHandler clientHandler) {
+        for (ClientHandler c : clients) {
+            if (c.getNick().equals(sNick)) {
+                String mess = String.format("[ %s ]: %s", clientHandler.getNick(), sMsg);
+                c.sendMessage(mess);
+                clientHandler.sendMessage(mess);
+            }
+        }
+    }
+
     public void subscribe(ClientHandler clientHandler) {
         clients.add(clientHandler);
     }
