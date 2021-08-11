@@ -46,22 +46,48 @@ public class Server {
     public void sendSpecificMsg(String sNick, String sMsg, ClientHandler clientHandler) {
         for (ClientHandler c : clients) {
             if (c.getNick().equals(sNick)) {
-                String mess = String.format("[ %s ]: %s", clientHandler.getNick(), sMsg);
+                String mess = String.format("[ %s ] to [ %s ] : %s", clientHandler.getNick(), sNick, sMsg);
                 c.sendMessage(mess);
-                clientHandler.sendMessage(mess);
+                if (!clientHandler.getNick().equals(sNick)) {
+                    clientHandler.sendMessage(mess);
+                }
+                return;
             }
         }
+        clientHandler.sendMessage("Not found user " + sNick);
     }
 
     public void subscribe(ClientHandler clientHandler) {
         clients.add(clientHandler);
+        broadcastClients();
     }
 
     public void unsubscribe(ClientHandler clientHandler) {
         clients.remove(clientHandler);
+        broadcastClients();
     }
 
     public AuthService getAuthService() {
         return authService;
+    }
+
+    public boolean isLoginAuthenticated(String login) {
+        for (ClientHandler c : clients) {
+            if (c.getLogin().equals(login)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void broadcastClients() {
+        StringBuilder sb = new StringBuilder("/clientlist");
+        for (ClientHandler c : clients) {
+            sb.append(" ").append(c.getNick());
+        }
+        String mess = sb.toString();
+        for (ClientHandler c : clients) {
+            c.sendMessage(mess);
+        }
     }
 }

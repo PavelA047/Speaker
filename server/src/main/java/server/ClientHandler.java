@@ -13,6 +13,7 @@ public class ClientHandler {
 
     private boolean authenticated;
     private String nick;
+    private String login;
 
     public ClientHandler(Socket socket, Server server) {
         try {
@@ -35,13 +36,31 @@ public class ClientHandler {
                         if (string.startsWith("/auth ")) {
                             String[] token = string.split("\\s+");
                             nick = server.getAuthService().getNickByLogAndPas(token[1], token[2]);
+                            login = token[1];
                             if (nick != null) {
-                                server.subscribe(this);
-                                authenticated = true;
-                                sendMessage("/authok " + nick);
-                                break;
+                                if (!server.isLoginAuthenticated(login)) {
+                                    sendMessage("/authok " + nick);
+                                    server.subscribe(this);
+                                    authenticated = true;
+                                    break;
+                                } else {
+                                    sendMessage("This login is busy");
+                                }
                             } else {
                                 sendMessage("Incorrect login/password");
+                            }
+                        }
+                        if (string.startsWith("/reg")) {
+                            String[] token = string.split("\\s+");
+                            if (token.length < 4) {
+                                continue;
+                            }
+                            boolean regOk = server.getAuthService().registration(token[1], token[2],
+                                    token[3]);
+                            if (regOk) {
+                                sendMessage("/regOk");
+                            } else {
+                                sendMessage("/regNo");
                             }
                         }
                     }
@@ -49,16 +68,21 @@ public class ClientHandler {
                     while (authenticated) {
                         String string = in.readUTF();
 
-                        if (string.equals("/end")) {
-                            sendMessage("/end");
-                            System.out.println("Client disconnected");
-                            break;
-                        }
-
-                        if (string.startsWith("/w")) {
-                            String specificMsg = string.split("\\s", 3)[2];
-                            String specificNick = string.split("\\s", 3)[1];
-                            server.sendSpecificMsg(specificNick, specificMsg, this);
+                        if (string.startsWith("/")) {
+                            if (string.equals("/end")) {
+                                sendMessage("/end");
+                                System.out.println("Client disconnected");
+                                break;
+                            }
+                            if (string.startsWith("/w")) {
+                                String[] token = string.split("\\s+", 3);
+                                if (token.length < 3) {
+                                    continue;
+                                }
+                                String specificMsg = token[2];
+                                String specificNick = token[1];
+                                server.sendSpecificMsg(specificNick, specificMsg, this);
+                            }
                         } else {
                             server.broadcastMassage(this, string);
                         }
@@ -89,5 +113,9 @@ public class ClientHandler {
 
     public String getNick() {
         return nick;
+    }
+
+    public String getLogin() {
+        return login;
     }
 }
