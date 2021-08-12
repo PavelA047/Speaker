@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 public class ClientHandler {
     Socket socket;
@@ -25,6 +26,7 @@ public class ClientHandler {
 
             new Thread(() -> {
                 try {
+                    socket.setSoTimeout(5000);
                     while (true) {
                         String string = in.readUTF();
 
@@ -42,6 +44,7 @@ public class ClientHandler {
                                     sendMessage("/authok " + nick);
                                     server.subscribe(this);
                                     authenticated = true;
+                                    socket.setSoTimeout(0);
                                     break;
                                 } else {
                                     sendMessage("This login is busy");
@@ -87,6 +90,8 @@ public class ClientHandler {
                             server.broadcastMassage(this, string);
                         }
                     }
+                } catch (SocketTimeoutException e) {
+                    sendMessage("/end");
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
