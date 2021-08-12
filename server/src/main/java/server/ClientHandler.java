@@ -26,7 +26,7 @@ public class ClientHandler {
 
             new Thread(() -> {
                 try {
-                    socket.setSoTimeout(5000);
+                    socket.setSoTimeout(120000);
                     while (true) {
                         String string = in.readUTF();
 
