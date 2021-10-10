@@ -86,6 +86,15 @@ public class ClientHandler {
                                 String specificNick = token[1];
                                 server.sendSpecificMsg(specificNick, specificMsg, this);
                             }
+                            if (string.startsWith("/changeNick")) {
+                                String[] token = string.split("\\s+", 3);
+                                String nickOld = token[1];
+                                String nickNew = token[2];
+                                server.changeNickName(nickOld, nickNew);
+                                out.writeUTF("/changeNick " + nickNew);
+                                this.nick = nickNew;
+                                server.broadcastClients();
+                            }
                         } else {
                             server.broadcastMassage(this, string);
                         }
