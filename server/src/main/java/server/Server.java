@@ -42,6 +42,8 @@ public class Server {
         for (ClientHandler c : clients) {
             c.sendMessage(mess);
         }
+        int myNick = authService.getIdByNick(s.getNick());
+        authService.history(myNick, 888, msg);
     }
 
     public void sendSpecificMsg(String sNick, String sMsg, ClientHandler clientHandler) {
@@ -52,6 +54,9 @@ public class Server {
                 if (!clientHandler.getNick().equals(sNick)) {
                     clientHandler.sendMessage(mess);
                 }
+                int myNick = authService.getIdByNick(clientHandler.getNick());
+                int recNick = authService.getIdByNick(sNick);
+                authService.history(myNick, recNick, sMsg);
                 return;
             }
         }

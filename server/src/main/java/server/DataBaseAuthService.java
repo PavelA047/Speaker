@@ -68,4 +68,31 @@ public class DataBaseAuthService implements AuthService {
             troubles.printStackTrace();
         }
     }
+
+    @Override
+    public void history(Integer id_sender, Integer id_receiver, String message) {
+        try {
+            PreparedStatement pstmt = connection.prepareStatement("INSERT INTO history (id_sender, id_receiver, " +
+                    "message) VALUES (?, ?, ?)");
+            pstmt.setInt(1, id_sender);
+            pstmt.setInt(2, id_receiver);
+            pstmt.setString(3, message);
+            pstmt.execute();
+        } catch (SQLException troubles) {
+            troubles.printStackTrace();
+        }
+    }
+
+    @Override
+    public Integer getIdByNick(String nick) {
+        try {
+            PreparedStatement pstmt = connection.prepareStatement("SELECT id FROM users WHERE nick = ?");
+            pstmt.setString(1, nick);
+            ResultSet rs = pstmt.executeQuery();
+            return rs.getInt(1);
+        } catch (SQLException troubles) {
+            troubles.printStackTrace();
+        }
+        return null;
+    }
 }

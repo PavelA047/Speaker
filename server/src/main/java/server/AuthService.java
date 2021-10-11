@@ -7,4 +7,11 @@ public interface AuthService {
 
     default void changeNick(String nickOld, String nickNew) {
     }
+
+    default void history(Integer id_sender, Integer id_receiver, String message) {
+    }
+
+    default Integer getIdByNick(String nick) {
+        return null;
+    }
 }
