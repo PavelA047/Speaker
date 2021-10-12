@@ -15,7 +15,7 @@ public class Server {
 
     public Server() {
         clients = new CopyOnWriteArrayList<>();
-        authService = new SimpleAuthService();
+        authService = new DataBaseAuthService();
         try {
             server = new ServerSocket(PORT);
             System.out.println("Server started");
@@ -29,6 +29,7 @@ public class Server {
             e.printStackTrace();
         } finally {
             try {
+                DataBaseAuthService.disconnect();
                 server.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -41,6 +42,8 @@ public class Server {
         for (ClientHandler c : clients) {
             c.sendMessage(mess);
         }
+        int myNick = authService.getIdByNick(s.getNick());
+        authService.history(myNick, 888, msg);
     }
 
     public void sendSpecificMsg(String sNick, String sMsg, ClientHandler clientHandler) {
@@ -51,10 +54,17 @@ public class Server {
                 if (!clientHandler.getNick().equals(sNick)) {
                     clientHandler.sendMessage(mess);
                 }
+                int myNick = authService.getIdByNick(clientHandler.getNick());
+                int recNick = authService.getIdByNick(sNick);
+                authService.history(myNick, recNick, sMsg);
                 return;
             }
         }
         clientHandler.sendMessage("Not found user " + sNick);
+    }
+
+    public void changeNickName(String nickOld, String nickNew) {
+        authService.changeNick(nickOld, nickNew);
     }
 
     public void subscribe(ClientHandler clientHandler) {

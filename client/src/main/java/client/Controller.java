@@ -155,6 +155,13 @@ public class Controller implements Initializable {
                             if (string.equals("/end")) {
                                 break;
                             }
+                            if (string.startsWith("/changeNick")) {
+                                String[] token = string.split("\\s+", 2);
+                                String nickNew = token[1];
+                                Platform.runLater(() -> {
+                                    stage.setTitle(String.format("Speaker [ %s ]", nickNew));
+                                });
+                            }
                             if (string.startsWith("/clientlist ")) {
                                 String[] token = string.split("\\s+");
                                 Platform.runLater(() -> {
