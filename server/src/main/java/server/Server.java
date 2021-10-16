@@ -3,7 +3,6 @@ package server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -43,23 +42,6 @@ public class Server {
         for (ClientHandler c : clients) {
             c.sendMessage(mess);
         }
-        File[] filesList = (new File("client/src/main/java/client").listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.contains(".txt");
-            }
-        }));
-        for (File f : filesList) {
-            try {
-                FileOutputStream fos = new FileOutputStream(f, true);
-                fos.write((mess + "\n").getBytes(StandardCharsets.UTF_8));
-                fos.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         int myNick = authService.getIdByNick(s.getNick());
         authService.history(myNick, 888, msg);
     }
@@ -69,28 +51,8 @@ public class Server {
             if (c.getNick().equals(sNick)) {
                 String mess = String.format("[ %s ] to [ %s ] : %s", clientHandler.getNick(), sNick, sMsg);
                 c.sendMessage(mess);
-                File f = new File("client/src/main/java/client/" + c.getLogin() + ".txt");
-                try {
-                    FileOutputStream fos = new FileOutputStream(f, true);
-                    fos.write((mess + "\n").getBytes(StandardCharsets.UTF_8));
-                    fos.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 if (!clientHandler.getNick().equals(sNick)) {
                     clientHandler.sendMessage(mess);
-                    File f2 = new File("client/src/main/java/client/" + clientHandler.getLogin() + ".txt");
-                    try {
-                        FileOutputStream fos = new FileOutputStream(f2, true);
-                        fos.write((mess + "\n").getBytes(StandardCharsets.UTF_8));
-                        fos.close();
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }
                 int myNick = authService.getIdByNick(clientHandler.getNick());
                 int recNick = authService.getIdByNick(sNick);

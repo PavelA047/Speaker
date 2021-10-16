@@ -42,6 +42,7 @@ public class ClientHandler {
                                     sendMessage("/authok " + nick + " " + login);
                                     server.subscribe(this);
                                     authenticated = true;
+//                                    sendMessage(server.getAuthService().getMessageByNick(nick));
                                     socket.setSoTimeout(0);
                                     break;
                                 } else {

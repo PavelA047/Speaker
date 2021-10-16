@@ -22,8 +22,6 @@ import javafx.stage.WindowEvent;
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
-import java.nio.file.Files;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -116,6 +114,7 @@ public class Controller implements Initializable {
 
         if (!authenticated) {
             nick = "";
+            History.stop();
         }
         setTitle(nick);
         textArea.clear();
@@ -139,6 +138,8 @@ public class Controller implements Initializable {
                                 nick = token[1];
                                 login = token[2];
                                 setAuthenticated(true);
+                                textArea.appendText(History.getLast100LinesOfHistory(login));
+                                History.start(login);
                                 break;
                             }
                             if (string.equals("/regOk")) {
@@ -153,8 +154,6 @@ public class Controller implements Initializable {
                     }
 
                     while (authenticated) {
-                        file = new File("client/src/main/java/client/" + login + ".txt");
-                        file.createNewFile();
                         String string = in.readUTF();
                         if (string.startsWith("/")) {
                             if (string.equals("/end")) {
@@ -178,6 +177,7 @@ public class Controller implements Initializable {
                             }
                         } else {
                             textArea.appendText(string + "\n");
+                            History.writeLine(string);
                         }
                     }
 
