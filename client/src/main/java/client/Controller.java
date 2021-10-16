@@ -19,9 +19,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -50,6 +48,8 @@ public class Controller implements Initializable {
 
     private boolean authenticated;
     private String nick;
+    private String login;
+    File file;
     private Stage stage;
     private Stage regStage;
     private RegController regController;
@@ -114,6 +114,7 @@ public class Controller implements Initializable {
 
         if (!authenticated) {
             nick = "";
+            History.stop();
         }
         setTitle(nick);
         textArea.clear();
@@ -124,7 +125,6 @@ public class Controller implements Initializable {
             socket = new Socket(IP_ADDRESS, PORT);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
-
             new Thread(() -> {
                 try {
                     while (true) {
@@ -134,8 +134,12 @@ public class Controller implements Initializable {
                                 break;
                             }
                             if (string.startsWith("/authok")) {
-                                nick = string.split("\\s")[1];
+                                String[] token = string.split("\\s", 3);
+                                nick = token[1];
+                                login = token[2];
                                 setAuthenticated(true);
+                                textArea.appendText(History.getLast100LinesOfHistory(login));
+                                History.start(login);
                                 break;
                             }
                             if (string.equals("/regOk")) {
@@ -173,6 +177,7 @@ public class Controller implements Initializable {
                             }
                         } else {
                             textArea.appendText(string + "\n");
+                            History.writeLine(string);
                         }
                     }
 

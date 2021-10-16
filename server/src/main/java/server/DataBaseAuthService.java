@@ -95,4 +95,31 @@ public class DataBaseAuthService implements AuthService {
         }
         return null;
     }
+
+    @Override
+    public String getMessageByNick(String nick) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            PreparedStatement pstmt = connection.prepareStatement("SELECT (SELECT nick FROM users WHERE id = id_sender), " +
+                    "(SELECT nick FROM users WHERE id = id_receiver), " +
+                    "message " +
+                    "FROM history " +
+                    "WHERE id_sender = (SELECT id FROM users WHERE nick = ?) " +
+                    "OR id_receiver = (SELECT id FROM users WHERE nick = ?) " +
+                    "OR id_receiver = 888");
+            pstmt.setString(1, nick);
+            pstmt.setString(2, nick);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                String sender = rs.getString(1);
+                String receiver = rs.getString(2);
+                String text = rs.getString(3);
+                sb.append(String.format("[ %s ] to [ %s ]: %s\n", sender, receiver, text));
+            }
+            rs.close();
+        } catch (SQLException troubles) {
+            troubles.printStackTrace();
+        }
+        return sb.toString();
+    }
 }

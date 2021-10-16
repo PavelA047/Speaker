@@ -1,8 +1,6 @@
 package server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
@@ -41,9 +39,10 @@ public class ClientHandler {
                             login = token[1];
                             if (nick != null) {
                                 if (!server.isLoginAuthenticated(login)) {
-                                    sendMessage("/authok " + nick);
+                                    sendMessage("/authok " + nick + " " + login);
                                     server.subscribe(this);
                                     authenticated = true;
+//                                    sendMessage(server.getAuthService().getMessageByNick(nick));
                                     socket.setSoTimeout(0);
                                     break;
                                 } else {

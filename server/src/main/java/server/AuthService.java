@@ -14,4 +14,8 @@ public interface AuthService {
     default Integer getIdByNick(String nick) {
         return null;
     }
+
+    default String getMessageByNick(String nick) {
+        return null;
+    }
 }
