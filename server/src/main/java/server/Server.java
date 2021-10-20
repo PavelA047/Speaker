@@ -14,11 +14,11 @@ public class Server {
     private final int PORT = 8189;
     private List<ClientHandler> clients;
     private AuthService authService;
+    private ExecutorService service = Executors.newCachedThreadPool();
 
     public Server() {
         clients = new CopyOnWriteArrayList<>();
         authService = new DataBaseAuthService();
-        ExecutorService service = Executors.newCachedThreadPool();
         try {
             server = new ServerSocket(PORT);
             System.out.println("Server started");
@@ -26,9 +26,7 @@ public class Server {
             while (true) {
                 socket = server.accept();
                 System.out.println("Client connected");
-                service.execute(() -> {
-                    new ClientHandler(socket, this);
-                });
+                new ClientHandler(socket, this, service);
             }
         } catch (IOException e) {
             e.printStackTrace();
