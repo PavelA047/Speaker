@@ -3,26 +3,29 @@ package server;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.ExecutorService;
 
 public class ClientHandler {
     Socket socket;
     DataInputStream in;
     DataOutputStream out;
     Server server;
+    ExecutorService service;
 
     private boolean authenticated;
     private String nick;
     private String login;
 
-    public ClientHandler(Socket socket, Server server) {
+    public ClientHandler(Socket socket, Server server, ExecutorService service) {
         try {
             this.socket = socket;
             this.server = server;
+            this.service = service;
 
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
 
-            new Thread(() -> {
+            service.execute(() -> {
                 try {
                     socket.setSoTimeout(120000);
                     while (true) {
@@ -110,7 +113,7 @@ public class ClientHandler {
                         e.printStackTrace();
                     }
                 }
-            }).start();
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
