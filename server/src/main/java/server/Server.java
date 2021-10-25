@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class Server {
     private ServerSocket server;
@@ -15,18 +17,25 @@ public class Server {
     private List<ClientHandler> clients;
     private AuthService authService;
     private ExecutorService service = Executors.newCachedThreadPool();
+    private Logger logger = Logger.getLogger(Server.class.getName());
+    private LogManager manager = LogManager.getLogManager();
 
     public Server() {
+        try {
+            manager.readConfiguration(new FileInputStream("logging.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         clients = new CopyOnWriteArrayList<>();
         authService = new DataBaseAuthService();
         try {
             server = new ServerSocket(PORT);
-            System.out.println("Server started");
+            logger.info("Server started");
 
             while (true) {
                 socket = server.accept();
-                System.out.println("Client connected");
-                new ClientHandler(socket, this, service);
+                logger.info("Client connected");
+                new ClientHandler(socket, this, service, logger);
             }
         } catch (IOException e) {
             e.printStackTrace();
