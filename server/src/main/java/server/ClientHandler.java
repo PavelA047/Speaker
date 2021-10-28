@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutorService;
+import java.util.logging.Logger;
 
 public class ClientHandler {
     Socket socket;
@@ -11,16 +12,18 @@ public class ClientHandler {
     DataOutputStream out;
     Server server;
     ExecutorService service;
+    Logger logger;
 
     private boolean authenticated;
     private String nick;
     private String login;
 
-    public ClientHandler(Socket socket, Server server, ExecutorService service) {
+    public ClientHandler(Socket socket, Server server, ExecutorService service, Logger logger) {
         try {
             this.socket = socket;
             this.server = server;
             this.service = service;
+            this.logger = logger;
 
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
@@ -33,7 +36,7 @@ public class ClientHandler {
 
                         if (string.equals("/end")) {
                             sendMessage("/end");
-                            System.out.println("Client disconnected");
+                            logger.info("Client disconnected");
                             break;
                         }
                         if (string.startsWith("/auth ")) {
@@ -76,7 +79,7 @@ public class ClientHandler {
                         if (string.startsWith("/")) {
                             if (string.equals("/end")) {
                                 sendMessage("/end");
-                                System.out.println("Client disconnected");
+                                logger.info("Client disconnected");
                                 break;
                             }
                             if (string.startsWith("/w")) {
